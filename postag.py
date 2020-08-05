@@ -127,7 +127,7 @@ def stemming(hasil_token):
 def crftagger(hasil_stem):
     result = []
     ct = CRFTagger()
-    ct.set_model_file('C://Users/Grandis/Downloads/all_indo_man_tag_corpus_model.crf.tagger')
+    ct.set_model_file('D://dataset/all_indo_man_tag_corpus_model.crf.tagger')
     for i in hasil_stem:
         hasil = ct.tag_sents([i])
         for j in hasil:
@@ -205,7 +205,7 @@ def accuracy2(data_postag,data_manual):
 
 ############################# ~MAIN~ ################################
 def main():
-    parse_dokuji = parsing("D://corpus.txt")
+    parse_dokuji = parsing("D://dataset/corpus.txt")
     hasil_casefolding = case_folding(parse_dokuji)
     hasil_tokenisasi = tokenisasi(parse_dokuji)
     hasil_stemming = stemming(hasil_tokenisasi)
@@ -220,7 +220,7 @@ def main():
     print('\nNLP-ID')
     print(fix_nlpid)
 
-    hasil_manual = manualisasi("D://corpus_manual.txt")
+    hasil_manual = manualisasi("D://dataset/corpus_manual.txt")
     akurasi = accuracy(crf_tagger,hasil_manual)
     akurasi2 = accuracy2(fix_nlpid,hasil_manual)
     print('Akurasi dari CRF-Tagger = '+ str(akurasi) +'%')
