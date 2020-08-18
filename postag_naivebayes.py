@@ -4,8 +4,6 @@ import re
 import random
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from nltk.tokenize import word_tokenize
-from nltk.tag import CRFTagger
-from nlp_id.lemmatizer import Lemmatizer
 
 ############ ~~~~~~~~Preprocessing~~~~~~~ #############
 
@@ -193,65 +191,10 @@ def testing(hasil_prepro, tag_dict):
                     if not word_tag in tag_given_word.keys():
                         tag_given_word[word_tag]=0
                         f3 = ("P("+tag.upper()+"|"+word_token+")"+":"+str(tag_given_word[word_tag])+"\n")
-                        
-            # f2 = (word_token, random.choice(predicted_tags_with_max_probability).upper()) #randomly choose from list of max & equal probable tags
+                       
             f2 = (word_token, predicted_tags_with_max_probability[0].upper())
             result.append(f2)
     return result
-
-# def prior(hasil_prepro,jumlah_tag,total_tags):
-#     result = {}
-
-#     for words in hasil_prepro:
-#         for word_token in words :
-#             for tag in jumlah_tag.keys():
-#                 result[tag]=jumlah_tag[tag]/float(total_tags) #prior=count_of_tag/count_of_total_no_tags
-    
-#     return result
-
-# def likelihood(hasil_prepro, jumlah_tag, word_tag_dict):
-#     result = {}
-
-#     for words in hasil_prepro:
-#         for word_token in words :
-#             word=word_token.lower()
-#             for tag in jumlah_tag.keys():
-#                 word_tag=word+"_"+tag   
-#                 if word_tag in word_tag_dict.keys():
-#                     result[word_tag]=word_tag_dict[word_tag]/float(tag_dict[tag])
-#                 else:
-#                     result[word_tag]=0
-    
-#     return result
-
-# def posterior(prior, likelihood):
-#     result = {}
-#     post = {}
-#     hasil = []
-#     tag_given_word = {}
-
-#     for word_tag in likelihood.keys():
-#         max_prob = 0
-#         for tag in prior.keys():
-#             poste = prior[tag] * likelihood[word_tag]
-#             if poste > max_prob:
-#                 hasil = []
-#                 hasil.append(tag)
-#             elif poste == max_prob:  #if probabilty is same add to list of predicted tags
-#                 hasil.append(tag)
-                        
-                    
-#             if not word_tag in tag_given_word.keys():
-#                 tag_given_word[word_tag]=poste
-#                 f3 = ("P("+tag.upper()+"|"+word_tag+")"+":"+str(tag_given_word[word_tag])+"\n")
-#                 print(f3)
-            
-          
-                
-    
-#     return post
-
-
 
 
 def main():
