@@ -3,3 +3,4 @@
 Menggunakan model
 - NLP-ID
 - CRF-Tagger
+- Naive Bayes
