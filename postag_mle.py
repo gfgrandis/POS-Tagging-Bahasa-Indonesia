@@ -93,7 +93,7 @@ def fixing_wordtags(manualisasi):
         result.append(fix_word)
     return result
 
-#train keseluruhan
+#Menghitung kata-tag, jumlah tagset, total tag
 def train(training_wordtags):
     global word_tag_dict
     global tag_dict
@@ -245,8 +245,8 @@ def akurasi(hasil_postag,manual_tagging, total_tag):
             
             benar += 1
     result = (benar/total)*100
-    print(benar)
-    print(total)
+    # print(benar)
+    # print(total)
     
     return result
 
@@ -272,7 +272,6 @@ def main():
     #Evaluasi
     hasil_manual = manualisasi("D://dataset/corpus_manual.txt")
     akurasi2 = akurasi(test,hasil_manual,totaltag)
-    print(akurasi2)
-    print()
+    print('Akurasi dari Maximum Likelihood = '+ str("{:.2f}".format(akurasi2)) +'%')
 
 main()
