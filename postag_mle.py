@@ -4,10 +4,10 @@ import re
 import random
 from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from nltk.tokenize import word_tokenize
-from nltk.tag import CRFTagger
 from nlp_id.lemmatizer import Lemmatizer
 
-############ ~~~~~~~~Preprocessing~~~~~~~ #############
+
+###################### ~~~~~~Preprocessing~~~~ ######################
 
 # Parsing
 def parsing(file):
@@ -36,9 +36,6 @@ def tokenisasi(hasil_case_folding):
         for b in a:
             tokens = word_tokenize(b)
             result.append(tokens)
-    
-    # for i in result:
-    #     print(i)
     return result
 
 # Stemming
@@ -55,10 +52,11 @@ def stemming(hasil_token):
                 output = x
             temp.append(output)
         result.append(temp)
-        
     return result
 
-######################### ~Training~ ##################################
+
+###################### ~~~~~~Training~~~~ ######################
+
 tag_dict={}      #dictionary containing each tag with its count value
 word_tag_dict={} #dictionary to keep count of a word and tag occuring together
 total_no_of_tags = 0
@@ -80,7 +78,6 @@ def openfile_train(file):
                 word = "Sebuah"
             sen_tag.append((word, tag))
         result.append(sen_tag)
-
     return result
 
 #Ganti format menjadi dictionary
@@ -94,9 +91,9 @@ def fixing_wordtags(manualisasi):
             word_tag=words+"_"+tags 
             fix_word.append(word_tag)
         result.append(fix_word)
-    
     return result
 
+#train keseluruhan
 def train(training_wordtags):
     global word_tag_dict
     global tag_dict
@@ -116,13 +113,11 @@ def train(training_wordtags):
                 tag_dict[tag]=1
             else:
                 tag_dict[tag]=tag_dict[tag]+1
-        
     total_no_of_tags=sum(tag_dict.values())
 
 #Menghitung Jumlah tagset pada tagged-corpus
 def hitung_tag(tagged_corpus):
     result = {}
-
     for line in tagged_corpus:
         for token in line:
             token=token.lower()      
@@ -133,12 +128,10 @@ def hitung_tag(tagged_corpus):
                 result[tag]=1
             else:
                 result[tag]=result[tag]+1
-
     return result
 
-#Menghitung kata-tag di data latih
+#Menghitung kata-tag di tagged-corpus
 def hitung_wordtag(corpus_latih):
-
     word_tag_dict = {}
     for line in corpus_latih:
         for token in line:
@@ -147,39 +140,41 @@ def hitung_wordtag(corpus_latih):
                 word_tag_dict[token]=1
             else:
                 word_tag_dict[token]=word_tag_dict[token]+1  
-    
     return word_tag_dict
 
 #Menghitung Total jumlah tag di data latih
 def total_tag(hitung_tag):
-
     jumlah_total=sum(hitung_tag.values())
-
     return jumlah_total
 
-###################### ~~~~~~Testing~~~~ ##################
+
+###################### ~~~~~~Testing~~~~ ######################
 tag_given_word={}
 
 def testing(hasil_prepro, tag_dict):
     global tag_given_word
+    global word_tag_dict
     proba = []
     result = []
 
     for kalimat in hasil_prepro:
         for word_token in kalimat :
-            kata=word_token.lower()
             max_prob_of_tag=0
+            kata=word_token.lower()
             predicted_tags_with_max_probability=[] #list of tags with max probability.All tags in this list have equal probability which is maximum.
             predicted_tags_with_max_probability.append("NNP") #take default tag as NNP
             for tag in tag_dict.keys():
+                prior_of_tag=tag_dict[tag]/float(total_no_of_tags) #prior=count_of_tag/count_of_total_no_tags
                 word_tag=kata+"_"+tag   
                 if word_tag in word_tag_dict.keys():
                     likelihood_of_word_given_tag=word_tag_dict[word_tag]/float(tag_dict[tag])
                     
                     if likelihood_of_word_given_tag>max_prob_of_tag:
+                        max_prob_of_tag = likelihood_of_word_given_tag
                         predicted_tags_with_max_probability=[] #if probabilty is greater create new list of predicted tags
                         predicted_tags_with_max_probability.append(tag)
                     elif likelihood_of_word_given_tag==max_prob_of_tag:  #if probabilty is same add to list of predicted tags
+                        max_prob_of_tag = likelihood_of_word_given_tag
                         predicted_tags_with_max_probability.append(tag)
                         
                     
@@ -198,18 +193,86 @@ def testing(hasil_prepro, tag_dict):
     return result
 
 
+###################### ~~~~~~Evaluasi~~~~ ######################
+def manualisasi(file):
+    result = []
+    sen_tag = []
+    f = open(file, "r", encoding="ANSI")
+    lines = f.read().split("\n\n")
+    f.close()
+    for line in lines:
+        kalimat = line.split("\n")
+        
+        for kata in kalimat:
+            word_tag = kata.split("\t")
+            word = word_tag[0]
+            tag = word_tag[1]
+            if word == "ï»¿Sebuah":
+                word = "Sebuah"
+            result.append((word, tag))
+        # result.append(sen_tag)
+    return result
+
+def accuracy(data_postag,data_manual):
+    hitung, benar, salah, total = 0, 0, 0, 0
+    manual = []
+    for i in data_manual:
+        for j in i:
+            total += 1
+            manual.append(j)
+    # print(manual)
+    for i in data_postag:
+        for j in i:
+            if j in manual:
+                benar += 1
+                break
+            else:
+                salah += 1
+                # print(j) """Print word tag yang salah"""
+    hitung = ((total-salah)/total)*100 
+    return hitung
+
+def akurasi(hasil_postag,manual_tagging, total_tag):
+    result = 0
+    benar = 0
+
+    total = len(hasil_postag)
+
+    for i,j in zip(manual_tagging, hasil_postag):
+        # print(i)
+        # print(j)
+        if i == j:
+            
+            benar += 1
+    result = (benar/total)*100
+    print(benar)
+    print(total)
+    
+    return result
+
+
 def main():
+    #Preprocessing
     parse_dokuji = parsing("D://dataset/corpus.txt")
     hasil_casefolding = case_folding(parse_dokuji)
     hasil_tokenisasi = tokenisasi(parse_dokuji)
     hasil_stemming = stemming(hasil_tokenisasi)
-    korpus_hmm = openfile_train("D://dataset/corpus_manual.txt")
-    coba = fixing_wordtags(korpus_hmm)
-    jumlahtag = hitung_tag(coba)
+
+    #Training
+    korpus_hmm = openfile_train("D://dataset/postag.txt")
+    format_wordtags = fixing_wordtags(korpus_hmm)
+    jumlahtag = hitung_tag(format_wordtags)
     totaltag = total_tag(jumlahtag)
-    word_tag = hitung_wordtag(coba)
-    training = train(coba)
+    word_tag = hitung_wordtag(format_wordtags)
+    training = train(format_wordtags)
+
+    #Testing
     test = testing(hasil_tokenisasi, jumlahtag)
-    print(test)
+
+    #Evaluasi
+    hasil_manual = manualisasi("D://dataset/corpus_manual.txt")
+    akurasi2 = akurasi(test,hasil_manual,totaltag)
+    print(akurasi2)
+    print()
 
 main()
