@@ -6,7 +6,8 @@ from Sastrawi.Stemmer.StemmerFactory import StemmerFactory
 from nltk.tokenize import word_tokenize
 from nlp_id.lemmatizer import Lemmatizer
 
-############ ~~~~~~~~Preprocessing~~~~~~~ #############
+
+###################### ~~~~~~Preprocessing~~~~ ######################
 
 # Parsing
 def parsing(file):
@@ -53,7 +54,9 @@ def stemming(hasil_token):
         result.append(temp)
     return result
 
-######################### ~Training~ ##################################
+
+###################### ~~~~~~Training~~~~ ######################
+
 tag_dict={}      #dictionary containing each tag with its count value
 word_tag_dict={} #dictionary to keep count of a word and tag occuring together
 total_no_of_tags = 0
@@ -144,7 +147,8 @@ def total_tag(hitung_tag):
     jumlah_total=sum(hitung_tag.values())
     return jumlah_total
 
-###################### ~~~~~~Testing~~~~ ##################
+
+###################### ~~~~~~Testing~~~~ ######################
 tag_given_word={}
 
 def testing(hasil_prepro, tag_dict):
@@ -188,58 +192,8 @@ def testing(hasil_prepro, tag_dict):
             result.append(f2)
     return result
 
-# def prior(hasil_prepro,jumlah_tag,total_tags):
-#     result = {}
 
-#     for words in hasil_prepro:
-#         for word_token in words :
-#             for tag in jumlah_tag.keys():
-#                 result[tag]=jumlah_tag[tag]/float(total_tags) #prior=count_of_tag/count_of_total_no_tags
-    
-#     return result
-
-# def likelihood(hasil_prepro, jumlah_tag, word_tag_dict):
-#     result = {}
-
-#     for words in hasil_prepro:
-#         for word_token in words :
-#             word=word_token.lower()
-#             for tag in jumlah_tag.keys():
-#                 word_tag=word+"_"+tag   
-#                 if word_tag in word_tag_dict.keys():
-#                     result[word_tag]=word_tag_dict[word_tag]/float(tag_dict[tag])
-#                 else:
-#                     result[word_tag]=0
-    
-#     return result
-
-# def posterior(prior, likelihood):
-#     result = {}
-#     post = {}
-#     hasil = []
-#     tag_given_word = {}
-
-#     for word_tag in likelihood.keys():
-#         max_prob = 0
-#         for tag in prior.keys():
-#             poste = prior[tag] * likelihood[word_tag]
-#             if poste > max_prob:
-#                 hasil = []
-#                 hasil.append(tag)
-#             elif poste == max_prob:  #if probabilty is same add to list of predicted tags
-#                 hasil.append(tag)
-                        
-                    
-#             if not word_tag in tag_given_word.keys():
-#                 tag_given_word[word_tag]=poste
-#                 f3 = ("P("+tag.upper()+"|"+word_tag+")"+":"+str(tag_given_word[word_tag])+"\n")
-#                 print(f3)
-            
-          
-                
-    
-#     return post
-
+###################### ~~~~~~Evaluasi~~~~ ######################
 def manualisasi(file):
     result = []
     sen_tag = []
@@ -291,8 +245,8 @@ def akurasi(hasil_postag,manual_tagging, total_tag):
             
             benar += 1
     result = (benar/total)*100
-    print(benar)
-    print(total)
+    # print(benar)
+    # print(total)
     
     return result
 
@@ -318,7 +272,6 @@ def main():
     #Evaluasi
     hasil_manual = manualisasi("D://dataset/corpus_manual.txt")
     akurasi2 = akurasi(test,hasil_manual,totaltag)
-    print(akurasi2)
-    print()
+    print('Akurasi dari Naive Bayes = '+ str("{:.2f}".format(akurasi2)) +'%')
 
 main()
